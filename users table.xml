@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+xmlns:html="http://www.w3.org/TR/REC-html40">
+<Worksheet ss:Name="Table1">
+	<Table>
+		<Column ss:Index="2" ss:AutoFitWidth="0" ss:Width="110"/>
+		<Column ss:Index="3" ss:AutoFitWidth="0" ss:Width="110"/>
+		<Column ss:Index="4" ss:AutoFitWidth="0" ss:Width="110"/>
+		<Column ss:Index="5" ss:AutoFitWidth="0" ss:Width="110"/>
+		<Column ss:Index="6" ss:AutoFitWidth="0" ss:Width="110"/>
+		<Column ss:Index="7" ss:AutoFitWidth="0" ss:Width="110"/>
+		<Row>
+			<Cell><Data ss:Type="String">user_ID</Data></Cell>
+			<Cell><Data ss:Type="String">first_name</Data></Cell>
+			<Cell><Data ss:Type="String">last_name</Data></Cell>
+			<Cell><Data ss:Type="String">email</Data></Cell>
+			<Cell><Data ss:Type="String">phone_number</Data></Cell>
+			<Cell><Data ss:Type="String">role</Data></Cell>
+			<Cell><Data ss:Type="String">password</Data></Cell>
+		</Row>
+
+		<Row>
+			<Cell><Data ss:Type="Number">14830</Data></Cell>
+			<Cell><Data ss:Type="String">Minnie</Data></Cell>
+			<Cell><Data ss:Type="String">Mouse</Data></Cell>
+			<Cell><Data ss:Type="String">minnie.mouse@disney.org</Data></Cell>
+			<Cell><Data ss:Type="String">0123456789</Data></Cell>
+			<Cell><Data ss:Type="String">EMPLOYEE</Data></Cell>
+			<Cell><Data ss:Type="String">0123456789</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">32539</Data></Cell>
+			<Cell><Data ss:Type="String">Admin</Data></Cell>
+			<Cell><Data ss:Type="String">User</Data></Cell>
+			<Cell><Data ss:Type="String">admin@example.com</Data></Cell>
+			<Cell><Data ss:Type="String">0000000000</Data></Cell>
+			<Cell><Data ss:Type="String">ADMIN</Data></Cell>
+			<Cell><Data ss:Type="String">0000000000</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">40128</Data></Cell>
+			<Cell><Data ss:Type="String">Djin</Data></Cell>
+			<Cell><Data ss:Type="String">Darin</Data></Cell>
+			<Cell><Data ss:Type="String">themandalorian@starwars.com</Data></Cell>
+			<Cell><Data ss:Type="String">0321456987</Data></Cell>
+			<Cell><Data ss:Type="String">EMPLOYEE</Data></Cell>
+			<Cell><Data ss:Type="String">0321456789</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">45648</Data></Cell>
+			<Cell><Data ss:Type="String">Mickey</Data></Cell>
+			<Cell><Data ss:Type="String">Mouse</Data></Cell>
+			<Cell><Data ss:Type="String">mickey.mouse@waltdisney.org</Data></Cell>
+			<Cell><Data ss:Type="String">9876543210</Data></Cell>
+			<Cell><Data ss:Type="String">EMPLOYEE</Data></Cell>
+			<Cell><Data ss:Type="String">9876543210</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">46514</Data></Cell>
+			<Cell><Data ss:Type="String">Daisy</Data></Cell>
+			<Cell><Data ss:Type="String">Duck</Data></Cell>
+			<Cell><Data ss:Type="String">daisy.duck@disney.org</Data></Cell>
+			<Cell><Data ss:Type="String">3698520147</Data></Cell>
+			<Cell><Data ss:Type="String">EMPLOYEE</Data></Cell>
+			<Cell><Data ss:Type="String">3698520147</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">75317</Data></Cell>
+			<Cell><Data ss:Type="String">Donald</Data></Cell>
+			<Cell><Data ss:Type="String">Duck</Data></Cell>
+			<Cell><Data ss:Type="String">donald.duck@disney.org</Data></Cell>
+			<Cell><Data ss:Type="String">7410258963</Data></Cell>
+			<Cell><Data ss:Type="String">EMPLOYEE</Data></Cell>
+			<Cell><Data ss:Type="String">7410258963</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">81984</Data></Cell>
+			<Cell><Data ss:Type="String">Walt</Data></Cell>
+			<Cell><Data ss:Type="String">Disney</Data></Cell>
+			<Cell><Data ss:Type="String">walt.disney@disney.org</Data></Cell>
+			<Cell><Data ss:Type="String">1111111111</Data></Cell>
+			<Cell><Data ss:Type="String">MANAGER</Data></Cell>
+			<Cell><Data ss:Type="String">1111111111</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">96451</Data></Cell>
+			<Cell><Data ss:Type="String">Boba</Data></Cell>
+			<Cell><Data ss:Type="String">Fett</Data></Cell>
+			<Cell><Data ss:Type="String">boba.fett@starwars.com</Data></Cell>
+			<Cell><Data ss:Type="String">9874563210</Data></Cell>
+			<Cell><Data ss:Type="String">EMPLOYEE</Data></Cell>
+			<Cell><Data ss:Type="String">9874563210</Data></Cell>
+		</Row>
+		<Row>
+			<Cell><Data ss:Type="Number">96452</Data></Cell>
+			<Cell><Data ss:Type="String">Yoda</Data></Cell>
+			<Cell><Data ss:Type="String">Jedi</Data></Cell>
+			<Cell><Data ss:Type="String">masterjedi@starwars.com</Data></Cell>
+			<Cell><Data ss:Type="String">9999999999</Data></Cell>
+			<Cell><Data ss:Type="String">EMPLOYEE</Data></Cell>
+			<Cell><Data ss:Type="String">9999999999</Data></Cell>
+		</Row>	</Table>
+</Worksheet>
+</Workbook>
