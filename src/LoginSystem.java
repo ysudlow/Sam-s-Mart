@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import databasemanager.DatabaseManager;
 import databasemanager.Date;
+import databasemanager.PurchaseOrder;
 import databasemanager.User;
 import databasemanager.UserRole;
 import product.java.Product;
@@ -319,7 +320,7 @@ public class LoginSystem {
 
     // Method to display the user menu after successful login
     private static void displayUserMenu(Scanner scanner) throws Exception {
-        while (currentUser != null) { // Keep displaying the menu until the user signs out
+        while (currentUser != null) {
             System.out.println("User Menu:");
             System.out.println("1. View Products");
             System.out.println("2. Add/Delete Products");
@@ -330,13 +331,18 @@ public class LoginSystem {
             System.out.println("7. View Markdown Items");
             System.out.println("8. Sign Out");
 
-            // Show additional options for Admins and Managers
-            if (currentUser.getRole() == UserRole.ADMIN || currentUser.getRole() == UserRole.MANAGER) {
-                System.out.println("9. Role Management");
-                System.out.println("10. View All Users");
+            boolean isAdmin = (currentUser.getRole() == UserRole.ADMIN);
+            boolean isManager = (currentUser.getRole() == UserRole.MANAGER);
+
+            if (isAdmin) {
+                System.out.println("9. Manage Purchase Orders");
+                System.out.println("10. Role Management");
+                System.out.println("11. View All Users");
+            } else if (isManager) {
+                System.out.println("9. Manage Purchase Orders");
             }
 
-            System.out.println("11. Exit Application");
+            System.out.println("12. Exit Application");
 
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
@@ -368,20 +374,27 @@ public class LoginSystem {
                     signOut();
                     break;
                 case 9:
-                    if (currentUser.getRole() == UserRole.ADMIN) {
+                    if (isAdmin || isManager) {
+                        managePurchaseOrders(scanner);
+                    } else {
+                        System.out.println("Access denied. Only admins and managers can manage purchase orders.");
+                    }
+                    break;
+                case 10:
+                    if (isAdmin) {
                         manageRoles(scanner);
                     } else {
                         System.out.println("Access denied. Only admins can manage roles.");
                     }
                     break;
-                case 10:
-                    if (currentUser.getRole() == UserRole.ADMIN || currentUser.getRole() == UserRole.MANAGER) {
+                case 11:
+                    if (isAdmin) {
                         viewAllUsers();
                     } else {
-                        System.out.println("Access denied. Only admins and managers can view all users.");
+                        System.out.println("Access denied. Only admins can view all users.");
                     }
                     break;
-                case 11:
+                case 12:
                     System.out.println("Exiting application...");
                     System.exit(0);
                     break;
@@ -479,6 +492,171 @@ public class LoginSystem {
             default:
                 System.out.println("Invalid option. Please try again.");
                 break;
+        }
+    }
+
+    private static void managePurchaseOrders(Scanner scanner) {
+        boolean continueManaging = true;
+
+        while (continueManaging) {
+            System.out.println("Managing Purchase Orders:");
+            System.out.println("1. View Purchase Orders");
+            System.out.println("2. Add New Purchase Order");
+            System.out.println("3. Update Existing Purchase Order");
+            System.out.println("4. Delete Purchase Order");
+            System.out.println("5. Return to Main Menu");
+
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    viewPurchaseOrders(scanner);
+                    break;
+                case 2:
+                    addNewPurchaseOrder(scanner);
+                    break;
+                case 3:
+                    updatePurchaseOrder(scanner);
+                    break;
+                case 4:
+                    deletePurchaseOrder(scanner);
+                    break;
+                case 5:
+                    continueManaging = false;
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+                    break;
+            }
+        }
+    }
+
+    private static void viewPurchaseOrders(Scanner scanner) {
+        try (DatabaseManager dbManager = new DatabaseManager()) {
+            List<PurchaseOrder> orders = dbManager.getAllPurchaseOrders();
+            if (orders.isEmpty()) {
+                System.out.println("No purchase orders found.");
+            } else {
+                System.out.println("Purchase Orders List:");
+                for (PurchaseOrder order : orders) {
+                    // Assuming you have getters like getPoNumber, getProductId, etc.
+                    System.out.printf(
+                            "PO Number: %d, Product ID: %d, Quantity: %d, Order Date: %s, Tracking Number: %s%n",
+                            order.getPoNumber(),
+                            order.getProductId(),
+                            order.getQuantity(),
+                            order.getOrderDate().toString(),
+                            order.getTrackingNumber());
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving purchase orders: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void addNewPurchaseOrder(Scanner scanner) {
+        // Prompt the user to enter the productID
+        System.out.print("Enter productID: ");
+        int productID = scanner.nextInt();
+
+        try (DatabaseManager dbManager = new DatabaseManager()) {
+            // Check if the productID exists in the Product table
+            Product product = dbManager.getProductByID(productID);
+
+            if (product != null) {
+                // If the product exists, create a new PurchaseOrder object
+                PurchaseOrder newPurchaseOrder = new PurchaseOrder(productID, null, null);
+
+                // Set the productID
+                newPurchaseOrder.setProductID(productID);
+
+                // Generate random PO and Tracking numbers
+                Random rand = new Random();
+                int poNumber = rand.nextInt(90000) + 10000; // Random 5-digit PO number
+                String trackingNumber = String.valueOf(rand.nextInt(900000000) + 1000000000); // Random 10-digit
+                                                                                              // tracking number
+
+                // Set PO and Tracking numbers
+                newPurchaseOrder.setPoNumber(poNumber);
+                newPurchaseOrder.setTrackingNumber(trackingNumber);
+
+                // Set the quantity and order date as needed
+                int quantity = 1; // You can change this to the desired quantity
+                LocalDate orderDate = LocalDate.now(); // Set the order date to the current date
+
+                // Add the purchase order to the database
+                boolean isAdded = dbManager.addPurchaseOrder(newPurchaseOrder, quantity, orderDate);
+
+                if (isAdded) {
+                    System.out.println("Purchase order added successfully.");
+                    // Display the generated PO and Tracking numbers
+                    System.out.println("PO Number: " + poNumber);
+                    System.out.println("Tracking Number: " + trackingNumber);
+                } else {
+                    System.out.println("Failed to add purchase order.");
+                }
+            } else {
+                System.out.println("Product not found for the given productID.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error adding purchase order: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Rest of your methods...
+
+    private static void updatePurchaseOrder(Scanner scanner) {
+        System.out.print("Enter order ID to update: ");
+        int orderId = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        System.out.print("Enter new Product ID (or -1 to skip): ");
+        int productId = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        System.out.print("Enter new Quantity (or -1 to skip): ");
+        int quantity = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        System.out.print("Enter new Order Date (YYYY-MM-DD) or press Enter to skip: ");
+        String dateInput = scanner.nextLine();
+        LocalDate orderDate = dateInput.isEmpty() ? null : LocalDate.parse(dateInput);
+
+        System.out.print("Enter new Tracking Number (or press Enter to skip): ");
+        String trackingNumber = scanner.nextLine();
+
+        try (DatabaseManager dbManager = new DatabaseManager()) {
+            boolean isUpdated = dbManager.updatePurchaseOrder(orderId, productId, quantity, orderDate, trackingNumber);
+            if (isUpdated) {
+                System.out.println("Purchase order updated successfully.");
+            } else {
+                System.out.println("Failed to update purchase order.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error updating purchase order: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void deletePurchaseOrder(Scanner scanner) {
+        System.out.print("Enter order ID to delete: ");
+        int orderId = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        try (DatabaseManager dbManager = new DatabaseManager()) {
+            boolean isDeleted = dbManager.deletePurchaseOrder(orderId);
+            if (isDeleted) {
+                System.out.println("Purchase order deleted successfully.");
+            } else {
+                System.out.println("Failed to delete purchase order.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error deleting purchase order: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
