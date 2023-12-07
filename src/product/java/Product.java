@@ -5,7 +5,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class Product {
-    private int productID; // Set by the database
+    private int productID;
+    private String description;
     private String productName;
     private LocalDate expirationDate;
     private LocalDate markdownDate;
@@ -17,8 +18,11 @@ public class Product {
     private double total; // Set by the database
     private LocalDate dateAdded; // Set by the database
 
-    // Constructor without productID, total, and dateAdded since they are set by the
-    // database
+    public Product() {
+        // Default constructor
+    }
+
+    // Constructor for product data without productID, total, and dateAdded
     public Product(String productName, LocalDate expirationDate, LocalDate markdownDate, int quantity,
             String manufacturer, String brand, double price, String category) {
         this.productName = productName;
@@ -31,21 +35,18 @@ public class Product {
         this.category = category;
     }
 
-    // Constructor for productID, productName, and expirationDate (for expired
-    // items)
+    public Product(int productID, String description, LocalDate expirationDate, LocalDate markdownDate) {
+        this.productID = productID;
+        this.description = description;
+        this.expirationDate = expirationDate;
+        this.markdownDate = markdownDate;
+        // Initialize other fields as needed
+    }
+
     public Product(int productID, String productName, LocalDate expirationDate) {
         this.productID = productID;
         this.productName = productName;
         this.expirationDate = expirationDate;
-    }
-
-    // Constructor for productID, productName, expirationDate, and markdownDate (for
-    // markdown items)
-    public Product(int productID, String productName, LocalDate expirationDate, LocalDate markdownDate) {
-        this.productID = productID;
-        this.productName = productName;
-        this.expirationDate = expirationDate;
-        this.markdownDate = markdownDate;
     }
 
     // Constructor that takes a ResultSet and extracts the product data
@@ -160,5 +161,13 @@ public class Product {
                 + ", markdownDate=" + markdownDate + ", quantity=" + quantity + ", manufacturer=" + manufacturer
                 + ", brand=" + brand + ", price=" + price + ", category=" + category + ", total=" + total
                 + ", dateAdded=" + dateAdded + "]";
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
