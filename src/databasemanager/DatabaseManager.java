@@ -10,6 +10,7 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 import product.java.Product;
@@ -464,16 +465,13 @@ public class DatabaseManager implements AutoCloseable {
         String query = "SELECT productID, productName, expirationDate FROM product WHERE expirationDate < CURDATE()";
 
         try (Connection connection = this.getConnection();
-                Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 int productId = rs.getInt("productID");
                 String productName = rs.getString("productName");
-                LocalDate expirationDate = null;
-                if (rs.getDate("expirationDate").toLocalDate() != null) {
-                    expirationDate = rs.getDate("expirationDate").toLocalDate();
-                }
+                LocalDate expirationDate = rs.getDate("expirationDate").toLocalDate();
 
                 // Create a Product object with the retrieved values
                 Product product = new Product(productId, productName, expirationDate);
@@ -506,6 +504,168 @@ public class DatabaseManager implements AutoCloseable {
             }
         }
         return products;
+    }
+
+    public List<PurchaseOrder> getAllPurchaseOrders() throws SQLException {
+        List<PurchaseOrder> purchaseOrders = new ArrayList<>();
+        String query = "SELECT purchaseOrderID, orderDate, deliverydate, /* other columns */ FROM purchase_orders";
+
+        try (Connection connection = this.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int purchaseOrderID = rs.getInt("purchaseOrderID");
+
+                // Retrieve the orderDate column as java.sql.Date
+                java.sql.Date orderDate = rs.getDate("orderDate");
+                LocalDate localOrderDate = (orderDate != null) ? orderDate.toLocalDate() : null;
+
+                // Retrieve the deliverydate column as java.sql.Date
+                java.sql.Date deliveryDate = rs.getDate("deliverydate");
+                LocalDate localDeliveryDate = (deliveryDate != null) ? deliveryDate.toLocalDate() : null;
+
+                // Create a PurchaseOrder object with the retrieved values
+                PurchaseOrder purchaseOrder = new PurchaseOrder(purchaseOrderID, localOrderDate, localDeliveryDate /*
+                                                                                                                    * other
+                                                                                                                    * values
+                                                                                                                    */);
+                purchaseOrders.add(purchaseOrder);
+            }
+        }
+        return purchaseOrders;
+    }
+
+    public boolean addPurchaseOrder(PurchaseOrder newPurchaseOrder, int quantity, LocalDate orderDate)
+            throws SQLException {
+        int poNumber = generateRandomPoNumber();
+        String trackingNumber = generateRandomTrackingNumber();
+
+        String query = "INSERT INTO purchase_orders (po_number, productID, quantity, order_date, tracking_number) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = this.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, poNumber);
+            pstmt.setInt(2, newPurchaseOrder.getProductID()); // Extract productID from newPurchaseOrder
+            pstmt.setInt(3, quantity);
+            pstmt.setDate(4, Date.valueOf(orderDate));
+            pstmt.setString(5, trackingNumber);
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return false;
+    }
+
+    public Product getProductByID(int productID) throws SQLException {
+        String query = "SELECT * FROM product WHERE productID = ?";
+        try (Connection conn = this.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, productID);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Product product = new Product();
+                    product.setProductID(rs.getInt("productID"));
+                    product.setDescription(rs.getString("description"));
+                    // Set other product attributes as needed
+
+                    // Check for null values and convert to LocalDate if not null
+                    java.sql.Date expirationDate = rs.getDate("expirationDate");
+                    if (expirationDate != null) {
+                        product.setExpirationDate(expirationDate.toLocalDate());
+                    }
+
+                    java.sql.Date markdownDate = rs.getDate("markdownDate");
+                    if (markdownDate != null) {
+                        product.setMarkdownDate(markdownDate.toLocalDate());
+                    }
+
+                    // Set other attributes in a similar manner
+
+                    return product;
+                }
+            }
+        } catch (SQLException e) {
+            // Handle any exceptions here
+            e.printStackTrace();
+            throw e; // You might want to handle this exception differently
+        }
+
+        // Return null if no product found with the given productID
+        return null;
+    }
+
+    public String getDescription(int productID) throws SQLException {
+        String query = "SELECT description FROM product WHERE productID = ?";
+        try (Connection conn = this.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, productID);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("description");
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+
+        return null; // No product found
+    }
+
+    public boolean updatePurchaseOrder(int poNumber, int productId, int quantity, LocalDate orderDate,
+            String trackingNumber) throws SQLException {
+        String query = "UPDATE purchase_orders SET productID = ?, quantity = ?, order_date = ?, tracking_number = ? WHERE po_number = ?";
+        try (Connection conn = this.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, productId);
+            pstmt.setInt(2, quantity);
+            pstmt.setDate(3, Date.valueOf(orderDate));
+            pstmt.setString(4, trackingNumber);
+            pstmt.setInt(5, poNumber);
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return false;
+    }
+
+    public boolean deletePurchaseOrder(int poNumber) throws SQLException {
+        String query = "DELETE FROM purchase_orders WHERE po_number = ?";
+        try (Connection conn = this.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, poNumber);
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+        return false;
+    }
+
+    private int generateRandomPoNumber() {
+        return new Random().nextInt(90000) + 10000; // Random 5-digit number
+    }
+
+    private String generateRandomTrackingNumber() {
+        return String.format("%010d", new Random().nextLong(9000000000L) + 1000000000L); // Random 10-digit number
+    }
+
+    private void handleSQLException(SQLException e) throws SQLException {
+        // Handle SQLException here, you can log the error or perform other actions as
+        // needed
+        e.printStackTrace();
+        throw e;
     }
 
     @Override
